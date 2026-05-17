@@ -426,7 +426,7 @@ function generateCode(fname, lname) {
   return code;
 }
 function getLink(code) {
-  return window.location.href.split('?')[0] + '?ref=' + code;
+  return 'https://gripandgogolf.com/foreward-golf';
 }
 
 function handleSignup() {
@@ -466,14 +466,14 @@ function copyLink() { navigator.clipboard.writeText(document.getElementById('dis
 function shareText() {
   const code = document.getElementById('display-code').textContent;
   const firstName = code.replace('GRIP','').slice(0,1) + code.replace('GRIP','').slice(1).toLowerCase();
-  const msg = `Hey! I get my clubs fitted at Grip & Go Golf — highly recommend it. Book a fitting and just mention my name (${firstName}) when you arrive. Check them out: ${getLink(code)}`;
+  const msg = `Hey! I get my clubs fitted at Grip & Go Golf — highly recommend it. Book a fitting and just mention my name when you arrive. Book here: https://gripandgogolf.com/foreward-golf`;
   if (navigator.share) { navigator.share({ text: msg }); }
   else { navigator.clipboard.writeText(msg); alert('Message copied to clipboard!'); }
 }
 function shareEmail() {
   const code = document.getElementById('display-code').textContent;
   const subject = encodeURIComponent('You should get a golf club fitting at Grip & Go Golf');
-  const body = encodeURIComponent(`Hey!\n\nI get my clubs custom fitted at Grip & Go Golf and they're great.\n\nWhen you book, just mention my name when you arrive — no codes or forms needed.\n\nBook your fitting here: ${getLink(code)}\n\nSee you on the course!`);
+  const body = encodeURIComponent(`Hey!\n\nI get my clubs custom fitted at Grip & Go Golf and they're great.\n\nWhen you book, just mention my name when you arrive — no codes or forms needed.\n\nBook your fitting here: https://gripandgogolf.com/foreward-golf\n\nSee you on the course!`);
   window.location.href = `mailto:?subject=${subject}&body=${body}`;
 }
 
