@@ -233,17 +233,16 @@
   <div class="hero">
     <div class="hero-badge">Referral Program</div>
     <h1>Share the Game.<br><span>Earn Real Rewards.</span></h1>
-    <p>Refer a friend to Grip &amp; Go Golf and earn cash every time they book a fitting or purchase clubs — no limits.</p>
+    <p>Refer a friend to Grip &amp; Go Golf and earn $25 when they complete their fitting — and they'll earn a $25 credit too.</p>
 
     <div class="reward-row">
       <div class="reward-card">
-        <div class="amount">$20</div>
-        <div class="label">per fitting completed<br>by your referral</div>
+        <div class="amount">$25</div>
+        <div class="label">cash reward for you<br>per completed fitting</div>
       </div>
-      <div class="reward-plus">+</div>
       <div class="reward-card">
-        <div class="amount">1%</div>
-        <div class="label">of total pre-tax purchase<br>on clubs &amp; services</div>
+        <div class="amount">$25</div>
+        <div class="label">credit for your friend<br>after their fitting</div>
       </div>
     </div>
 
@@ -272,7 +271,7 @@
       <div class="step">
         <div class="step-num">4</div>
         <h3>You get paid</h3>
-        <p>Earn $20 when their fitting is complete, plus 1% of any club or service purchase.</p>
+        <p>Earn $25 when their fitting is complete. Your friend gets a $25 credit toward their next purchase too.</p>
       </div>
     </div>
   </div>
@@ -375,9 +374,9 @@
       <div class="reward-ref-title">Reward Reference</div>
       <div class="reward-ref-body">
         • <strong>When a referred customer arrives:</strong> Click "+ Log Referral", enter their name, and select who sent them.<br>
-        • <strong>After fitting is complete:</strong> Click "Mark Fitting Done" — $20 is auto-logged to the referrer.<br>
-        • <strong>If they purchase clubs or services:</strong> Click "Log Purchase" and enter the pre-tax amount — 1% is auto-calculated.<br>
-        • <strong>Paying out rewards:</strong> Apply as a manual discount in Square on the referrer's next visit.
+        • <strong>After fitting is complete:</strong> Click "Mark Fitting Done" — $25 is auto-logged to the referrer.<br>
+        • <strong>Referee credit:</strong> Apply a $25 manual discount in Square on the new customer's next purchase.<br>
+        • <strong>Paying out referrer rewards:</strong> Apply as a manual discount in Square on the referrer's next visit.
       </div>
     </div>
   </div>
@@ -508,32 +507,15 @@ function markFittingDone(id) {
   if (!ref) return;
   ref.status = 'fitting-done';
   const referrer = data.referrers.find(r => r.id === ref.referrerId);
-  if (referrer) referrer.earned = +(((referrer.earned || 0) + 20).toFixed(2));
+  if (referrer) referrer.earned = +(((referrer.earned || 0) + 25).toFixed(2));
   saveData(data);
-  alert(`Fitting marked complete.\n$20 reward logged for ${ref.referrerName}.\n\nPay out via manual discount in Square on their next visit.`);
-  renderAdmin();
-}
-
-function logPurchase(id) {
-  const amt = prompt('Enter the pre-tax purchase amount ($):');
-  if (amt === null) return;
-  const num = parseFloat(amt);
-  if (isNaN(num) || num < 0) { alert('Please enter a valid dollar amount.'); return; }
-  const bonus = +(num * 0.01).toFixed(2);
-  const data = getData();
-  const ref = data.referrals.find(r => r.id === id);
-  if (!ref) return;
-  ref.status = 'purchase-logged'; ref.purchaseAmt = num;
-  const referrer = data.referrers.find(r => r.id === ref.referrerId);
-  if (referrer) referrer.earned = +(((referrer.earned || 0) + bonus).toFixed(2));
-  saveData(data);
-  alert(`Logged! ${ref.referrerName} earns an additional $${bonus.toFixed(2)} (1% of $${num.toFixed(2)}).`);
+  alert(`Fitting marked complete.\n\n$25 reward logged for ${ref.referrerName} — pay out via manual discount in Square on their next visit.\n\n$25 credit owed to ${ref.customerName} — apply as a manual discount in Square on their next purchase.`);
   renderAdmin();
 }
 
 function renderAdmin() {
   const data = getData();
-  const fittingsDone = data.referrals.filter(r => r.status === 'fitting-done' || r.status === 'purchase-logged').length;
+  const fittingsDone = data.referrals.filter(r => r.status === 'fitting-done').length;
   const totalEarned = data.referrers.reduce((s, r) => s + (r.earned || 0), 0);
 
   document.getElementById('stats-grid').innerHTML = `
@@ -565,13 +547,11 @@ function renderAdmin() {
     refbody.innerHTML = `<tr><td colspan="5" class="empty-state">No referrals logged yet. Click "+ Log Referral" when a customer mentions a referrer's name at their appointment.</td></tr>`;
   } else {
     refbody.innerHTML = data.referrals.map(ref => {
-      const bc = ref.status === 'purchase-logged' ? 'badge-purchase' : ref.status === 'fitting-done' ? 'badge-fitting' : 'badge-pending';
-      const sl = ref.status === 'purchase-logged' ? 'Purchase Logged' : ref.status === 'fitting-done' ? 'Fitting Done' : 'Pending';
+      const bc = ref.status === 'fitting-done' ? 'badge-fitting' : 'badge-pending';
+      const sl = ref.status === 'fitting-done' ? 'Fitting Done' : 'Pending';
       const actions = ref.status === 'pending'
         ? `<button class="mark-btn" onclick="markFittingDone(${ref.id})">Mark Fitting Done</button>`
-        : ref.status === 'fitting-done'
-        ? `<button class="mark-btn" onclick="logPurchase(${ref.id})">Log Purchase (1%)</button>`
-        : `<span style="font-size:12px;color:var(--text-muted);">Complete</span>`;
+        : `<span style="font-size:12px;color:var(--text-muted);">Complete ✓</span>`;
       return `<tr>
         <td>${ref.customerName}</td>
         <td>${ref.referrerName} <span style="font-size:11px;color:var(--text-muted);">(${ref.referrerCode})</span></td>
@@ -585,8 +565,8 @@ function renderAdmin() {
 
 function exportCSV() {
   const data = getData();
-  let csv = 'Customer,Referred By,Code,Date,Status,Purchase Amt\n';
-  data.referrals.forEach(r => { csv += `"${r.customerName}","${r.referrerName}","${r.referrerCode}","${r.date}","${r.status}","${r.purchaseAmt||''}"\n`; });
+  let csv = 'Customer,Referred By,Code,Date,Status\n';
+  data.referrals.forEach(r => { csv += `"${r.customerName}","${r.referrerName}","${r.referrerCode}","${r.date}","${r.status}"\n`; });
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
   a.download = 'grip-go-referrals.csv'; a.click();
 }
