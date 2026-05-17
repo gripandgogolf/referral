@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Grip & Go Golf — Referral Program</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --green: #1a3d2b; --green-mid: #2e6b47;
+    --gold: #c9a84c; --gold-light: #e8c97a;
+    --cream: #f7f3ec; --white: #ffffff;
+    --text: #1a1a1a; --text-muted: #6b6b5f;
+    --border: rgba(26,61,43,0.15); --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
+  h1,h2,h3 { font-family: 'Playfair Display', serif; }
+
+  nav {
+    background: var(--green); padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px; position: sticky; top: 0; z-index: 100;
+  }
+  .nav-brand { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 1.2rem; letter-spacing: 0.03em; }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    background: none; border: none; color: rgba(255,255,255,0.6);
+    padding: 8px 16px; border-radius: 8px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; transition: all 0.2s;
+  }
+  .nav-tab:hover { color: var(--white); background: rgba(255,255,255,0.08); }
+  .nav-tab.active { color: var(--gold); background: rgba(201,168,76,0.15); }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .hero {
+    background: var(--green); padding: 5rem 2rem 4rem;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 60% 40%, rgba(201,168,76,0.12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(201,168,76,0.2); color: var(--gold-light);
+    border: 1px solid rgba(201,168,76,0.35);
+    padding: 6px 18px; border-radius: 100px;
+    font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 { color: var(--white); font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.15; margin-bottom: 1rem; }
+  .hero h1 span { color: var(--gold); }
+  .hero p { color: rgba(255,255,255,0.7); font-size: 1.05rem; max-width: 520px; margin: 0 auto 2.5rem; line-height: 1.7; }
+
+  .reward-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem; }
+  .reward-card {
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius); padding: 1.25rem 1.75rem; text-align: center; min-width: 200px;
+  }
+  .reward-card .amount { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--gold); font-weight: 700; }
+  .reward-card .label { color: rgba(255,255,255,0.6); font-size: 13px; margin-top: 4px; line-height: 1.4; }
+  .reward-plus { display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.3); font-size: 1.8rem; padding: 0.5rem; }
+
+  .btn-primary {
+    background: var(--gold); color: var(--green);
+    border: none; border-radius: 8px; padding: 14px 32px;
+    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; display: inline-block;
+  }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  .section { max-width: 760px; margin: 0 auto; padding: 3rem 1.5rem; }
+  .section-title { font-size: 1.6rem; color: var(--green); margin-bottom: 0.5rem; }
+  .section-sub { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
+
+  .form-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2rem 2.5rem;
+    box-shadow: 0 4px 24px rgba(26,61,43,0.06);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-group { margin-bottom: 1.25rem; }
+  .form-group label { display: block; font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .form-group input, .form-group select {
+    width: 100%; padding: 11px 14px; border: 1px solid var(--border);
+    border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 15px;
+    background: var(--cream); color: var(--text); transition: border-color 0.2s; outline: none;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--green-mid); background: var(--white); }
+  .form-note { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+  .success-box {
+    background: var(--green); border-radius: 16px; padding: 2.5rem;
+    text-align: center; color: var(--white); display: none;
+  }
+  .success-box.show { display: block; }
+  .success-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+  .success-box h2 { font-size: 1.6rem; color: var(--gold); margin-bottom: 0.5rem; }
+  .success-box p { color: rgba(255,255,255,0.75); margin-bottom: 1.5rem; font-size: 0.95rem; }
+
+  .code-display {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 10px; padding: 1rem 1.5rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 1rem 0;
+  }
+  .code-value { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--gold); letter-spacing: 0.08em; }
+  .copy-btn {
+    background: rgba(201,168,76,0.2); border: 1px solid rgba(201,168,76,0.4);
+    color: var(--gold-light); border-radius: 6px; padding: 6px 14px;
+    font-size: 13px; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .copy-btn:hover { background: rgba(201,168,76,0.35); }
+  .link-display {
+    background: rgba(255,255,255,0.07); border-radius: 8px;
+    padding: 10px 14px; font-size: 13px; color: rgba(255,255,255,0.6);
+    word-break: break-all; margin-bottom: 1rem;
+  }
+
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+  .step { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
+  .step-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--green); color: var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; margin-bottom: 1rem;
+  }
+  .step h3 { font-size: 0.95rem; color: var(--green); margin-bottom: 6px; }
+  .step p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+  .share-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 1rem; }
+  .share-btn {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    color: var(--white); border-radius: 8px; padding: 8px 18px;
+    font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .share-btn:hover { background: rgba(255,255,255,0.18); }
+
+  /* ADMIN */
+  .admin-header {
+    background: var(--green); padding: 2rem 1.5rem;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+  }
+  .admin-header h1 { color: var(--gold); font-size: 1.4rem; }
+  .admin-header p { color: rgba(255,255,255,0.6); font-size: 13px; margin-top: 4px; }
+  .admin-body { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
+  .stat-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
+  .stat-value { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--green); }
+  .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  table { width: 100%; border-collapse: collapse; background: var(--white); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+  th { background: var(--green); color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; padding: 12px 16px; text-align: left; }
+  td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--cream); }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 500; }
+  .badge-pending { background: #fef3c7; color: #92400e; }
+  .badge-fitting { background: #d1fae5; color: #065f46; }
+  .badge-purchase { background: #dbeafe; color: #1e40af; }
+
+  .mark-btn {
+    background: var(--green); color: var(--gold);
+    border: none; border-radius: 6px; padding: 5px 12px;
+    font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.2s;
+  }
+  .mark-btn:hover { opacity: 0.85; }
+
+  .table-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--green); margin-bottom: 1rem; }
+  .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); font-size: 14px; }
+
+  .reward-ref {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.25rem; margin-top: 2rem;
+  }
+  .reward-ref-title { font-weight: 500; font-size: 14px; color: var(--green); margin-bottom: 0.5rem; }
+  .reward-ref-body { font-size: 13px; color: var(--text-muted); line-height: 1.9; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--white); border-radius: 16px; padding: 2rem;
+    width: 100%; max-width: 440px; margin: 1rem;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+  }
+  .modal h2 { font-size: 1.2rem; color: var(--green); margin-bottom: 0.35rem; }
+  .modal > p { font-size: 13px; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 1rem; }
+  .btn-cancel {
+    background: none; border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 20px; font-family: 'DM Sans', sans-serif; font-size: 14px;
+    cursor: pointer; color: var(--text-muted);
+  }
+  .btn-save {
+    background: var(--green); color: var(--gold); border: none; border-radius: 8px;
+    padding: 10px 20px; font-family: 'DM Sans', sans-serif; font-size: 14px;
+    cursor: pointer; font-weight: 500;
+  }
+
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    .form-card { padding: 1.5rem; }
+    nav { padding: 0 1rem; }
+    .nav-brand { font-size: 1rem; }
+    .nav-tab { padding: 6px 10px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Grip &amp; Go Golf</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('home')">Join</button>
+  </div>
+</nav>
+
+<!-- ===== JOIN PAGE ===== -->
+<div id="page-home" class="page active">
+
+  <div class="hero">
+    <div class="hero-badge">Referral Program</div>
+    <h1>Share the Game.<br><span>Earn Real Rewards.</span></h1>
+    <p>Refer a friend to Grip &amp; Go Golf and earn cash every time they book a fitting or purchase clubs — no limits.</p>
+
+    <div class="reward-row">
+      <div class="reward-card">
+        <div class="amount">$20</div>
+        <div class="label">per fitting completed<br>by your referral</div>
+      </div>
+      <div class="reward-plus">+</div>
+      <div class="reward-card">
+        <div class="amount">1%</div>
+        <div class="label">of total pre-tax purchase<br>on clubs &amp; services</div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="document.getElementById('signup-section').scrollIntoView({behavior:'smooth'})">Get My Referral Link</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">How it works</div>
+    <div class="section-sub">Simple as your best drive.</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Sign up below</h3>
+        <p>Create your free referral account and get your unique code &amp; shareable link instantly.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Share your link</h3>
+        <p>Text it, post it, send it — anyone interested can click through to book a fitting.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>They just mention you</h3>
+        <p>Your friend books normally and simply mentions your name when they arrive. No codes or forms needed.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>You get paid</h3>
+        <p>Earn $20 when their fitting is complete, plus 1% of any club or service purchase.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="signup-section" style="padding-top:0;">
+    <div class="section-title">Create your referral account</div>
+    <div class="section-sub">Free to join. No credit card required.</div>
+
+    <div class="form-card" id="signup-form-wrap">
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" id="fname" placeholder="John"/>
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" id="lname" placeholder="Smith"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="john@email.com"/>
+        <div class="form-note">We'll use this to contact you about your rewards.</div>
+      </div>
+      <div class="form-group">
+        <label>Phone (optional)</label>
+        <input type="tel" id="phone" placeholder="(916) 555-0100"/>
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:0.5rem;" onclick="handleSignup()">Generate My Referral Code →</button>
+      <div id="form-error" style="color:#c0392b;font-size:13px;margin-top:10px;display:none;"></div>
+    </div>
+
+    <div class="success-box" id="success-box">
+      <div class="success-icon">🏌️</div>
+      <h2>You're in!</h2>
+      <p id="success-name-msg">Your referral code is ready. Share it and start earning.</p>
+
+      <div style="text-align:left;margin-bottom:0.5rem;">
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;">Your referral code</div>
+        <div class="code-display">
+          <div class="code-value" id="display-code">—</div>
+          <button class="copy-btn" id="copy-code-btn" onclick="copyCode()">Copy code</button>
+        </div>
+      </div>
+
+      <div style="text-align:left;margin-bottom:0.25rem;">
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;">Your shareable link</div>
+        <div class="link-display" id="display-link">—</div>
+      </div>
+
+      <div class="share-row">
+        <button class="share-btn" onclick="copyLink()">📋 Copy Link</button>
+        <button class="share-btn" onclick="shareText()">💬 Share via Text</button>
+        <button class="share-btn" onclick="shareEmail()">✉️ Share via Email</button>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:1rem;margin-top:1.5rem;text-align:left;">
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.07em;">How your friend redeems</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.7;">They book their fitting normally, then <strong style="color:var(--gold-light);">mention your name</strong> when they arrive. That's it — no codes, no forms on their end.</div>
+      </div>
+
+      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:1.5rem;">Screenshot your code or bookmark this page for easy access.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== ADMIN PAGE ===== -->
+<div id="page-admin" class="page">
+  <div class="admin-header">
+    <div>
+      <h1>Referral Dashboard</h1>
+      <p>Grip &amp; Go Golf — Admin View</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="copy-btn" onclick="openLogModal()">+ Log Referral</button>
+      <button class="copy-btn" onclick="exportCSV()">Export CSV</button>
+      <button class="copy-btn" onclick="clearData()">Reset Data</button>
+    </div>
+  </div>
+
+  <div class="admin-body">
+    <div class="stats-grid" id="stats-grid"></div>
+
+    <div class="table-title">Referral Members</div>
+    <table>
+      <thead><tr><th>Name</th><th>Code</th><th>Email</th><th>Joined</th><th>Referrals</th><th>Rewards Owed</th></tr></thead>
+      <tbody id="referrers-body"><tr><td colspan="6" class="empty-state">No referral members yet.</td></tr></tbody>
+    </table>
+
+    <div style="margin-top:2rem;"></div>
+
+    <div class="table-title">Logged Referrals</div>
+    <table>
+      <thead><tr><th>Customer</th><th>Referred By</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="referrals-body"><tr><td colspan="5" class="empty-state">No referrals logged yet. Click "+ Log Referral" when a customer mentions a referrer's name at their appointment.</td></tr></tbody>
+    </table>
+
+    <div class="reward-ref">
+      <div class="reward-ref-title">Reward Reference</div>
+      <div class="reward-ref-body">
+        • <strong>When a referred customer arrives:</strong> Click "+ Log Referral", enter their name, and select who sent them.<br>
+        • <strong>After fitting is complete:</strong> Click "Mark Fitting Done" — $20 is auto-logged to the referrer.<br>
+        • <strong>If they purchase clubs or services:</strong> Click "Log Purchase" and enter the pre-tax amount — 1% is auto-calculated.<br>
+        • <strong>Paying out rewards:</strong> Apply as a manual discount in Square on the referrer's next visit.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOG REFERRAL MODAL -->
+<div class="modal-overlay" id="log-modal">
+  <div class="modal">
+    <h2>Log a Referral</h2>
+    <p>Enter the customer's name and select who referred them. Use this when a customer mentions a referrer at their appointment.</p>
+    <div class="form-group">
+      <label>Customer Name</label>
+      <input type="text" id="log-customer" placeholder="Jane Doe"/>
+    </div>
+    <div class="form-group">
+      <label>Referred By</label>
+      <select id="log-referrer"><option value="">— Select a referral member —</option></select>
+    </div>
+    <div id="log-error" style="color:#c0392b;font-size:13px;margin-bottom:8px;display:none;"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeLogModal()">Cancel</button>
+      <button class="btn-save" onclick="saveReferral()">Save Referral</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function getData() {
+  try {
+    return {
+      referrers: JSON.parse(localStorage.getItem('ggg_referrers') || '[]'),
+      referrals: JSON.parse(localStorage.getItem('ggg_referrals') || '[]')
+    };
+  } catch(e) { return { referrers: [], referrals: [] }; }
+}
+function saveData(d) {
+  localStorage.setItem('ggg_referrers', JSON.stringify(d.referrers));
+  localStorage.setItem('ggg_referrals', JSON.stringify(d.referrals));
+}
+
+function generateCode(fname, lname) {
+  const base = ('GRIP' + fname.toUpperCase().slice(0,1) + lname.toUpperCase().slice(0,5)).replace(/[^A-Z]/g,'');
+  const existing = getData().referrers.map(r => r.code);
+  let code = base, i = 2;
+  while (existing.includes(code)) { code = base + i; i++; }
+  return code;
+}
+function getLink(code) {
+  return window.location.href.split('?')[0] + '?ref=' + code;
+}
+
+function handleSignup() {
+  const fname = document.getElementById('fname').value.trim();
+  const lname = document.getElementById('lname').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const errEl = document.getElementById('form-error');
+  if (!fname || !lname || !email) { errEl.textContent = 'Please fill in your first name, last name, and email.'; errEl.style.display = 'block'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Please enter a valid email address.'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+  const data = getData();
+  const existing = data.referrers.find(r => r.email.toLowerCase() === email.toLowerCase());
+  if (existing) { showSuccess(existing); return; }
+  const code = generateCode(fname, lname);
+  const referrer = { id: Date.now(), fname, lname, email, phone, code, joined: new Date().toLocaleDateString(), earned: 0 };
+  data.referrers.push(referrer);
+  saveData(data);
+  showSuccess(referrer);
+}
+
+function showSuccess(r) {
+  document.getElementById('signup-form-wrap').style.display = 'none';
+  document.getElementById('success-box').classList.add('show');
+  document.getElementById('success-name-msg').textContent = `Welcome, ${r.fname}! Share your code and start earning.`;
+  document.getElementById('display-code').textContent = r.code;
+  document.getElementById('display-link').textContent = getLink(r.code);
+}
+
+let ct;
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById('display-code').textContent).catch(()=>{});
+  const b = document.getElementById('copy-code-btn'); b.textContent = 'Copied!';
+  clearTimeout(ct); ct = setTimeout(() => b.textContent = 'Copy code', 2000);
+}
+function copyLink() { navigator.clipboard.writeText(document.getElementById('display-link').textContent).catch(()=>{}); }
+function shareText() {
+  const code = document.getElementById('display-code').textContent;
+  const firstName = code.replace('GRIP','').slice(0,1) + code.replace('GRIP','').slice(1).toLowerCase();
+  const msg = `Hey! I get my clubs fitted at Grip & Go Golf — highly recommend it. Book a fitting and just mention my name (${firstName}) when you arrive. Check them out: ${getLink(code)}`;
+  if (navigator.share) { navigator.share({ text: msg }); }
+  else { navigator.clipboard.writeText(msg); alert('Message copied to clipboard!'); }
+}
+function shareEmail() {
+  const code = document.getElementById('display-code').textContent;
+  const subject = encodeURIComponent('You should get a golf club fitting at Grip & Go Golf');
+  const body = encodeURIComponent(`Hey!\n\nI get my clubs custom fitted at Grip & Go Golf and they're great.\n\nWhen you book, just mention my name when you arrive — no codes or forms needed.\n\nBook your fitting here: ${getLink(code)}\n\nSee you on the course!`);
+  window.location.href = `mailto:?subject=${subject}&body=${body}`;
+}
+
+function openLogModal() {
+  const data = getData();
+  const sel = document.getElementById('log-referrer');
+  sel.innerHTML = '<option value="">— Select a referral member —</option>';
+  data.referrers.forEach(r => {
+    const o = document.createElement('option'); o.value = r.id;
+    o.textContent = `${r.fname} ${r.lname} (${r.code})`; sel.appendChild(o);
+  });
+  document.getElementById('log-customer').value = '';
+  document.getElementById('log-error').style.display = 'none';
+  document.getElementById('log-modal').classList.add('open');
+}
+function closeLogModal() { document.getElementById('log-modal').classList.remove('open'); }
+function saveReferral() {
+  const customer = document.getElementById('log-customer').value.trim();
+  const referrerId = document.getElementById('log-referrer').value;
+  const errEl = document.getElementById('log-error');
+  if (!customer || !referrerId) { errEl.textContent = 'Please fill in both fields.'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+  const data = getData();
+  const referrer = data.referrers.find(r => r.id == referrerId);
+  data.referrals.push({ id: Date.now(), customerName: customer, referrerId: referrer.id, referrerName: referrer.fname + ' ' + referrer.lname, referrerCode: referrer.code, date: new Date().toLocaleDateString(), status: 'pending' });
+  saveData(data); closeLogModal(); renderAdmin();
+}
+
+function markFittingDone(id) {
+  const data = getData();
+  const ref = data.referrals.find(r => r.id === id);
+  if (!ref) return;
+  ref.status = 'fitting-done';
+  const referrer = data.referrers.find(r => r.id === ref.referrerId);
+  if (referrer) referrer.earned = +(((referrer.earned || 0) + 20).toFixed(2));
+  saveData(data);
+  alert(`Fitting marked complete.\n$20 reward logged for ${ref.referrerName}.\n\nPay out via manual discount in Square on their next visit.`);
+  renderAdmin();
+}
+
+function logPurchase(id) {
+  const amt = prompt('Enter the pre-tax purchase amount ($):');
+  if (amt === null) return;
+  const num = parseFloat(amt);
+  if (isNaN(num) || num < 0) { alert('Please enter a valid dollar amount.'); return; }
+  const bonus = +(num * 0.01).toFixed(2);
+  const data = getData();
+  const ref = data.referrals.find(r => r.id === id);
+  if (!ref) return;
+  ref.status = 'purchase-logged'; ref.purchaseAmt = num;
+  const referrer = data.referrers.find(r => r.id === ref.referrerId);
+  if (referrer) referrer.earned = +(((referrer.earned || 0) + bonus).toFixed(2));
+  saveData(data);
+  alert(`Logged! ${ref.referrerName} earns an additional $${bonus.toFixed(2)} (1% of $${num.toFixed(2)}).`);
+  renderAdmin();
+}
+
+function renderAdmin() {
+  const data = getData();
+  const fittingsDone = data.referrals.filter(r => r.status === 'fitting-done' || r.status === 'purchase-logged').length;
+  const totalEarned = data.referrers.reduce((s, r) => s + (r.earned || 0), 0);
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Members</div><div class="stat-value">${data.referrers.length}</div><div class="stat-sub">referral accounts</div></div>
+    <div class="stat-card"><div class="stat-label">Referrals Logged</div><div class="stat-value">${data.referrals.length}</div><div class="stat-sub">by you</div></div>
+    <div class="stat-card"><div class="stat-label">Fittings Done</div><div class="stat-value">${fittingsDone}</div><div class="stat-sub">completed</div></div>
+    <div class="stat-card"><div class="stat-label">Rewards Owed</div><div class="stat-value">$${totalEarned.toFixed(0)}</div><div class="stat-sub">to referrers</div></div>
+  `;
+
+  const rbody = document.getElementById('referrers-body');
+  if (!data.referrers.length) {
+    rbody.innerHTML = '<tr><td colspan="6" class="empty-state">No referral members yet.</td></tr>';
+  } else {
+    const counts = {};
+    data.referrals.forEach(r => { counts[r.referrerId] = (counts[r.referrerId] || 0) + 1; });
+    rbody.innerHTML = data.referrers.map(r => `
+      <tr>
+        <td>${r.fname} ${r.lname}</td>
+        <td><code style="background:var(--cream);padding:2px 8px;border-radius:4px;font-size:13px;">${r.code}</code></td>
+        <td style="font-size:13px;">${r.email}</td>
+        <td>${r.joined}</td>
+        <td>${counts[r.id] || 0}</td>
+        <td style="font-weight:500;color:var(--green);">$${(r.earned || 0).toFixed(2)}</td>
+      </tr>`).join('');
+  }
+
+  const refbody = document.getElementById('referrals-body');
+  if (!data.referrals.length) {
+    refbody.innerHTML = `<tr><td colspan="5" class="empty-state">No referrals logged yet. Click "+ Log Referral" when a customer mentions a referrer's name at their appointment.</td></tr>`;
+  } else {
+    refbody.innerHTML = data.referrals.map(ref => {
+      const bc = ref.status === 'purchase-logged' ? 'badge-purchase' : ref.status === 'fitting-done' ? 'badge-fitting' : 'badge-pending';
+      const sl = ref.status === 'purchase-logged' ? 'Purchase Logged' : ref.status === 'fitting-done' ? 'Fitting Done' : 'Pending';
+      const actions = ref.status === 'pending'
+        ? `<button class="mark-btn" onclick="markFittingDone(${ref.id})">Mark Fitting Done</button>`
+        : ref.status === 'fitting-done'
+        ? `<button class="mark-btn" onclick="logPurchase(${ref.id})">Log Purchase (1%)</button>`
+        : `<span style="font-size:12px;color:var(--text-muted);">Complete</span>`;
+      return `<tr>
+        <td>${ref.customerName}</td>
+        <td>${ref.referrerName} <span style="font-size:11px;color:var(--text-muted);">(${ref.referrerCode})</span></td>
+        <td>${ref.date}</td>
+        <td><span class="badge ${bc}">${sl}</span></td>
+        <td>${actions}</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+function exportCSV() {
+  const data = getData();
+  let csv = 'Customer,Referred By,Code,Date,Status,Purchase Amt\n';
+  data.referrals.forEach(r => { csv += `"${r.customerName}","${r.referrerName}","${r.referrerCode}","${r.date}","${r.status}","${r.purchaseAmt||''}"\n`; });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = 'grip-go-referrals.csv'; a.click();
+}
+function clearData() {
+  if (confirm('Clear ALL referral data? This cannot be undone.')) {
+    localStorage.removeItem('ggg_referrers'); localStorage.removeItem('ggg_referrals'); renderAdmin();
+  }
+}
+
+const ADMIN_PASSWORD = 'Hudson$3.25!';
+let adminUnlocked = false;
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t => { if (t.textContent.trim().toLowerCase() === 'join') t.classList.add('active'); });
+  if (name === 'admin') renderAdmin();
+}
+
+function tryAdminAccess() {
+  if (adminUnlocked) { showPage('admin'); return; }
+  const pw = prompt('Enter admin password:');
+  if (pw === null) return;
+  if (pw === ADMIN_PASSWORD) {
+    adminUnlocked = true;
+    showPage('admin');
+  } else {
+    alert('Incorrect password.');
+  }
+}
+
+// Check URL for ?admin to trigger password prompt
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('admin')) {
+    tryAdminAccess();
+  }
+});
+
+document.getElementById('log-modal').addEventListener('click', function(e) { if (e.target === this) closeLogModal(); });
+</script>
+</body>
+</html>
